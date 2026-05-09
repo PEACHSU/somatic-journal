@@ -30,7 +30,7 @@ body{background:var(--bg);font-family:'Noto Serif SC',serif;padding:28px 16px 60
 
   <div class="view active" id="vForm">
     <div class="sl">感應部位</div>
-    <input id="ptSearch" style="width:100%;border:none;border-bottom:1.5px solid var(--bd);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--ink);padding:7px 4px;outline:none;letter-spacing:1px;margin-bottom:8px" placeholder="搜尋穴位名稱…" oninput="searchPts(this.value)">
+    <input id="ptSearch" style="width:100%;border:none;border-bottom:1.5px solid var(--bd);background:transparent;font-family:'Noto Sans TC',sans-serif;font-size:12px;color:var(--ink);padding:7px 4px;outline:none;letter-spacing:1px;margin-bottom:8px" placeholder="搜尋穴位名稱、經絡或代碼…" oninput="searchPts(this.value)">
     <div class="zrow" id="zRow"></div><div class="chips" id="pChips"></div><div class="selbox" id="selBox"><div class="lbl">已選部位</div><div class="selitems" id="selItems"></div></div>
     <div class="sl">感覺類型</div><div class="chips" id="sChips"></div>
     <div class="sl">感應對象</div><div class="chips" id="cChips" style="margin-bottom:16px"></div>
@@ -53,9 +53,56 @@ function getAT(){var cfg=loadConfig();if(!cfg.token)return null;var base=cfg.bas
 function toggleCfg(){var bar=document.getElementById("cfgBar");if(bar.style.display==="none"||bar.style.display===""){var cfg=loadConfig();document.getElementById("cfgToken").value=cfg.token||"";document.getElementById("cfgBase").value=cfg.base||DEFAULT_BASE;document.getElementById("cfgTable").value=cfg.table||DEFAULT_TABLE;bar.style.display="block";}else{bar.style.display="none";}}
 
 var ZONES=[{id:"all",l:"全部"},{id:"head",l:"頭面"},{id:"neck",l:"頸肩"},{id:"chest",l:"胸腹"},{id:"back",l:"背腰"},{id:"arm",l:"手臂"},{id:"leg",l:"腿足"},{id:"hip",l:"臀薦"}];
-var PTS=[
-{id:"右中府",z:"chest",n:"中府",s:"右肺LU1",tip:"胸前，肺之募穴",c:"ro"},{id:"左中府",z:"chest",n:"中府",s:"左肺LU1",tip:"胸前，肺之募穴",c:"ro"},{id:"右雲門",z:"chest",n:"雲門",s:"右肺LU2",tip:"鎖骨下",c:"ro"},{id:"左雲門",z:"chest",n:"雲門",s:"左肺LU2",tip:"鎖骨下",c:"ro"},{id:"右合谷",z:"arm",n:"合谷",s:"右大腸LI4",tip:"虎口",c:"sa"},{id:"左合谷",z:"arm",n:"合谷",s:"左大腸LI4",tip:"虎口",c:"sa"},{id:"迎香",z:"head",n:"迎香",s:"大腸LI20",tip:"鼻翼旁",c:"sa"},{id:"右足三里",z:"leg",n:"足三里",s:"右胃ST36",tip:"脛骨外側",c:"am"},{id:"左足三里",z:"leg",n:"足三里",s:"左胃ST36",tip:"脛骨外側",c:"am"},{id:"右三陰交",z:"leg",n:"三陰交",s:"右脾SP6",tip:"內踝上",c:"vi"},{id:"左三陰交",z:"leg",n:"三陰交",s:"左脾SP6",tip:"內踝上",c:"vi"},{id:"右神門",z:"arm",n:"神門",s:"右心HT7",tip:"腕橫紋小指側",c:"ro"},{id:"左神門",z:"arm",n:"神門",s:"左心HT7",tip:"腕橫紋小指側",c:"ro"},{id:"右內關",z:"arm",n:"內關",s:"右心包PC6",tip:"腕上",c:"ro"},{id:"左內關",z:"arm",n:"內關",s:"左心包PC6",tip:"腕上",c:"ro"},{id:"右勞宮",z:"arm",n:"勞宮",s:"右心包PC8",tip:"手心",c:"ro"},{id:"左勞宮",z:"arm",n:"勞宮",s:"左心包PC8",tip:"手心",c:"ro"},{id:"右太溪",z:"leg",n:"太溪",s:"右腎KD3",tip:"內踝後",c:"am"},{id:"左太溪",z:"leg",n:"太溪",s:"左腎KD3",tip:"內踝後",c:"am"},{id:"右湧泉",z:"leg",n:"湧泉",s:"右腎KD1",tip:"足心",c:"am"},{id:"左湧泉",z:"leg",n:"湧泉",s:"左腎KD1",tip:"足心",c:"am"},{id:"右丘墟",z:"leg",n:"丘墟",s:"右膽GB40",tip:"外踝前下，膽原穴",c:"sk"},{id:"左丘墟",z:"leg",n:"丘墟",s:"左膽GB40",tip:"外踝前下，膽原穴",c:"sk"},{id:"右太衝",z:"leg",n:"太衝",s:"右肝LR3",tip:"足背",c:"vi"},{id:"左太衝",z:"leg",n:"太衝",s:"左肝LR3",tip:"足背",c:"vi"},{id:"膻中",z:"chest",n:"膻中",s:"任脈CV17",tip:"兩乳中點",c:"am"},{id:"神闕",z:"chest",n:"神闕",s:"任脈CV8",tip:"肚臍",c:"am"},{id:"百會",z:"head",n:"百會",s:"督脈GV20",tip:"頭頂",c:"am"},{id:"印堂",z:"head",n:"印堂",s:"奇穴EX-HN3",tip:"眉心",c:"am"},{id:"八髎",z:"hip",n:"八髎",s:"奇穴EX-B7",tip:"薦骨",c:"ro"}
+
+var MERIDIANS=[
+{code:"LU",name:"肺",c:"ro",side:1,pts:"中府 雲門 天府 俠白 尺澤 孔最 列缺 經渠 太淵 魚際 少商"},
+{code:"LI",name:"大腸",c:"sa",side:1,pts:"商陽 二間 三間 合谷 陽谿 偏歷 溫溜 下廉 上廉 手三里 曲池 肘髎 手五里 臂臑 肩髃 巨骨 天鼎 扶突 口禾髎 迎香"},
+{code:"ST",name:"胃",c:"am",side:1,pts:"承泣 四白 巨髎 地倉 大迎 頰車 下關 頭維 人迎 水突 氣舍 缺盆 氣戶 庫房 屋翳 膺窗 乳中 乳根 不容 承滿 梁門 關門 太乙 滑肉門 天樞 外陵 大巨 水道 歸來 氣衝 髀關 伏兔 陰市 梁丘 犢鼻 足三里 上巨虛 條口 下巨虛 豐隆 解谿 衝陽 陷谷 內庭 厲兌"},
+{code:"SP",name:"脾",c:"vi",side:1,pts:"隱白 大都 太白 公孫 商丘 三陰交 漏谷 地機 陰陵泉 血海 箕門 衝門 府舍 腹結 大橫 腹哀 食竇 天谿 胸鄉 周榮 大包"},
+{code:"HT",name:"心",c:"ro",side:1,pts:"極泉 青靈 少海 靈道 通里 陰郄 神門 少府 少衝"},
+{code:"SI",name:"小腸",c:"sa",side:1,pts:"少澤 前谷 後谿 腕骨 陽谷 養老 支正 小海 肩貞 臑俞 天宗 秉風 曲垣 肩外俞 肩中俞 天窗 天容 顴髎 聽宮"},
+{code:"BL",name:"膀胱",c:"sk",side:1,pts:"睛明 攢竹 眉衝 曲差 五處 承光 通天 絡卻 玉枕 天柱 大杼 風門 肺俞 厥陰俞 心俞 督俞 膈俞 肝俞 膽俞 脾俞 胃俞 三焦俞 腎俞 氣海俞 大腸俞 關元俞 小腸俞 膀胱俞 中膂俞 白環俞 上髎 次髎 中髎 下髎 會陽 承扶 殷門 浮郄 委陽 委中 附分 魄戶 膏肓 神堂 譩譆 膈關 魂門 陽綱 意舍 胃倉 肓門 志室 胞肓 秩邊 合陽 承筋 承山 飛揚 跗陽 崑崙 僕參 申脈 金門 京骨 束骨 足通谷 至陰"},
+{code:"KD",name:"腎",c:"am",side:1,pts:"湧泉 然谷 太溪 大鐘 水泉 照海 復溜 交信 築賓 陰谷 橫骨 大赫 氣穴 四滿 中注 肓俞 商曲 石關 陰都 腹通谷 幽門 步廊 神封 靈墟 神藏 彧中 俞府"},
+{code:"PC",name:"心包",c:"ro",side:1,pts:"天池 天泉 曲澤 郄門 間使 內關 大陵 勞宮 中衝"},
+{code:"TE",name:"三焦",c:"sk",side:1,pts:"關衝 液門 中渚 陽池 外關 支溝 會宗 三陽絡 四瀆 天井 清冷淵 消濼 臑會 肩髎 天髎 天牖 翳風 瘈脈 顱息 角孫 耳門 耳和髎 絲竹空"},
+{code:"GB",name:"膽",c:"sk",side:1,pts:"瞳子髎 聽會 上關 頷厭 懸顱 懸釐 曲鬢 率谷 天衝 浮白 頭竅陰 完骨 本神 陽白 頭臨泣 目窗 正營 承靈 腦空 風池 肩井 淵腋 輒筋 日月 京門 帶脈 五樞 維道 居髎 環跳 風市 中瀆 膝陽關 陽陵泉 陽交 外丘 光明 陽輔 懸鐘 丘墟 足臨泣 地五會 俠谿 足竅陰"},
+{code:"LR",name:"肝",c:"vi",side:1,pts:"大敦 行間 太衝 中封 蠡溝 中都 膝關 曲泉 陰包 足五里 陰廉 急脈 章門 期門"},
+{code:"CV",name:"任脈",c:"am",side:0,pts:"會陰 曲骨 中極 關元 石門 氣海 陰交 神闕 水分 下脘 建里 中脘 上脘 巨闕 鳩尾 中庭 膻中 玉堂 紫宮 華蓋 璇璣 天突 廉泉 承漿"},
+{code:"GV",name:"督脈",c:"am",side:0,pts:"長強 腰俞 腰陽關 命門 懸樞 脊中 中樞 筋縮 至陽 靈台 神道 身柱 陶道 大椎 瘂門 風府 腦戶 強間 後頂 百會 前頂 顖會 上星 神庭 素髎 水溝 兌端 齦交"}
 ];
+
+function inferZone(code,i){
+  if(code==="CV") return i<=1?"hip":i>=23?"head":"chest";
+  if(code==="GV") return i<=3?"hip":i<=14?"back":i<=16?"neck":"head";
+  if(code==="LU") return i<=2?"chest":"arm";
+  if(code==="LI") return i<=16?"arm":i<=18?"neck":"head";
+  if(code==="ST") return i<=8?"head":i<=12?"neck":i<=30?"chest":"leg";
+  if(code==="SP") return i<=10?"leg":"chest";
+  if(code==="HT") return "arm";
+  if(code==="SI") return i<=8?"arm":i<=15?"neck":"head";
+  if(code==="BL") return i<=10?"head":i<=30?"back":i<=35?"hip":i<=40?"leg":i<=54?"back":"leg";
+  if(code==="KD") return i<=10?"leg":"chest";
+  if(code==="PC") return i===1?"chest":"arm";
+  if(code==="TE") return i<=14?"arm":i<=20?"neck":"head";
+  if(code==="GB") return i<=20?"head":i<=21?"neck":i<=24?"chest":i<=30?"hip":"leg";
+  if(code==="LR") return i<=8?"leg":i<=12?"hip":"chest";
+  return "all";
+}
+
+var PTS=[];
+MERIDIANS.forEach(function(m){
+  m.pts.split(" ").forEach(function(n,idx){
+    var no=idx+1;
+    var base={z:inferZone(m.code,no),n:n,s:m.name+m.code+no,tip:m.name+"經 "+m.code+no,c:m.c};
+    if(m.side){
+      PTS.push(Object.assign({id:"右"+n},base,{s:"右"+base.s}));
+      PTS.push(Object.assign({id:"左"+n},base,{s:"左"+base.s}));
+    }else{
+      PTS.push(Object.assign({id:n},base));
+    }
+  });
+});
+
 var SENS=[{id:"電流",e:"⚡"},{id:"鈍痛",e:"●"},{id:"刺痛",e:"✦"},{id:"癢",e:"〰"},{id:"心悸",e:"♡"},{id:"鼻血",e:"◆"},{id:"出疹",e:"◉"},{id:"發冷",e:"❄"},{id:"發熱",e:"◈"},{id:"無感",e:"○"},{id:"跳動",e:"〜"},{id:"收緊",e:"◐"}];
 var CTXS=["人","物","地","決定","思緒","夢境"];
 var HEXAGRAMS=[{num:"1",n:"乾",s:"☰☰",nat:"天"},{num:"2",n:"坤",s:"☷☷",nat:"地"},{num:"3",n:"屯",s:"☵☳",nat:"水雷"},{num:"4",n:"蒙",s:"☶☵",nat:"山水"},{num:"5",n:"需",s:"☵☰",nat:"水天"},{num:"6",n:"訟",s:"☰☵",nat:"天水"},{num:"7",n:"師",s:"☷☵",nat:"地水"},{num:"8",n:"比",s:"☵☷",nat:"水地"},{num:"9",n:"小畜",s:"☴☰",nat:"風天"},{num:"10",n:"履",s:"☰☱",nat:"天澤"},{num:"11",n:"泰",s:"☷☰",nat:"地天"},{num:"12",n:"否",s:"☰☷",nat:"天地"},{num:"13",n:"同人",s:"☰☲",nat:"天火"},{num:"14",n:"大有",s:"☲☰",nat:"火天"},{num:"15",n:"謙",s:"☷☶",nat:"地山"},{num:"16",n:"豫",s:"☳☷",nat:"雷地"},{num:"17",n:"隨",s:"☱☳",nat:"澤雷"},{num:"18",n:"蠱",s:"☶☴",nat:"山風"},{num:"19",n:"臨",s:"☷☱",nat:"地澤"},{num:"20",n:"觀",s:"☴☷",nat:"風地"},{num:"21",n:"噬嗑",s:"☲☳",nat:"火雷"},{num:"22",n:"賁",s:"☶☲",nat:"山火"},{num:"23",n:"剝",s:"☶☷",nat:"山地"},{num:"24",n:"復",s:"☷☳",nat:"地雷"},{num:"25",n:"無妄",s:"☰☳",nat:"天雷"},{num:"26",n:"大畜",s:"☶☰",nat:"山天"},{num:"27",n:"頤",s:"☶☳",nat:"山雷"},{num:"28",n:"大過",s:"☱☴",nat:"澤風"},{num:"29",n:"坎",s:"☵☵",nat:"水水"},{num:"30",n:"離",s:"☲☲",nat:"火火"},{num:"31",n:"咸",s:"☱☶",nat:"澤山"},{num:"32",n:"恆",s:"☳☴",nat:"雷風"},{num:"33",n:"遯",s:"☰☶",nat:"天山"},{num:"34",n:"大壯",s:"☳☰",nat:"雷天"},{num:"35",n:"晉",s:"☲☷",nat:"火地"},{num:"36",n:"明夷",s:"☷☲",nat:"地火"},{num:"37",n:"家人",s:"☴☲",nat:"風火"},{num:"38",n:"睽",s:"☲☱",nat:"火澤"},{num:"39",n:"蹇",s:"☵☶",nat:"水山"},{num:"40",n:"解",s:"☳☵",nat:"雷水"},{num:"41",n:"損",s:"☶☱",nat:"山澤"},{num:"42",n:"益",s:"☴☳",nat:"風雷"},{num:"43",n:"夬",s:"☱☰",nat:"澤天"},{num:"44",n:"姤",s:"☰☴",nat:"天風"},{num:"45",n:"萃",s:"☱☷",nat:"澤地"},{num:"46",n:"升",s:"☷☴",nat:"地風"},{num:"47",n:"困",s:"☱☵",nat:"澤水"},{num:"48",n:"井",s:"☵☴",nat:"水風"},{num:"49",n:"革",s:"☱☲",nat:"澤火"},{num:"50",n:"鼎",s:"☲☴",nat:"火風"},{num:"51",n:"震",s:"☳☳",nat:"雷雷"},{num:"52",n:"艮",s:"☶☶",nat:"山山"},{num:"53",n:"漸",s:"☴☶",nat:"風山"},{num:"54",n:"歸妹",s:"☳☱",nat:"雷澤"},{num:"55",n:"豐",s:"☳☲",nat:"雷火"},{num:"56",n:"旅",s:"☲☶",nat:"火山"},{num:"57",n:"巽",s:"☴☴",nat:"風風"},{num:"58",n:"兌",s:"☱☱",nat:"澤澤"},{num:"59",n:"渙",s:"☴☵",nat:"風水"},{num:"60",n:"節",s:"☵☱",nat:"水澤"},{num:"61",n:"中孚",s:"☴☱",nat:"風澤"},{num:"62",n:"小過",s:"☳☶",nat:"雷山"},{num:"63",n:"既濟",s:"☵☲",nat:"水火"},{num:"64",n:"未濟",s:"☲☵",nat:"火水"}];
@@ -71,13 +118,13 @@ function importData(input){var file=input.files[0];if(!file)return;var reader=ne
 
 function renderZones(){document.getElementById("zRow").innerHTML=ZONES.map(function(z){return '<button class="zbtn'+(z.id===curZone?' on':'')+'" onclick="setZone(\''+z.id+'\')">'+z.l+'</button>';}).join("");}
 function searchPts(v){searchTerm=v.trim();renderChips();}
-function renderChips(){var filtered=curZone==="all"?PTS:PTS.filter(function(p){return p.z===curZone;});if(searchTerm)filtered=filtered.filter(function(p){return p.n.indexOf(searchTerm)>=0||p.id.indexOf(searchTerm)>=0||p.s.indexOf(searchTerm)>=0;});document.getElementById("pChips").innerHTML=filtered.map(function(p){var on=selLocs.indexOf(p.id)>=0;return '<button class="chip'+(on?' '+p.c:'')+'" title="'+p.tip.replace(/"/g,"&quot;")+'" data-id="'+encodeURIComponent(p.id)+'" onclick="chipClick(this)"><span>'+p.id+'</span></button>';}).join("");}
+function renderChips(){var filtered=curZone==="all"?PTS:PTS.filter(function(p){return p.z===curZone;});if(searchTerm)filtered=filtered.filter(function(p){return p.n.indexOf(searchTerm)>=0||p.id.indexOf(searchTerm)>=0||p.s.indexOf(searchTerm)>=0||p.tip.indexOf(searchTerm)>=0;});document.getElementById("pChips").innerHTML=filtered.map(function(p){var on=selLocs.indexOf(p.id)>=0;return '<button class="chip'+(on?' '+p.c:'')+'" title="'+p.tip.replace(/"/g,"&quot;")+'" data-id="'+encodeURIComponent(p.id)+'" onclick="chipClick(this)"><span>'+p.id+'</span></button>';}).join("");}
 function chipClick(btn){toggleLoc(decodeURIComponent(btn.dataset.id));}
 function renderSens(){document.getElementById("sChips").innerHTML=SENS.map(function(s){var on=selSens.indexOf(s.id)>=0;return '<button class="chip'+(on?' sa':'')+'" data-sid="'+encodeURIComponent(s.id)+'" onclick="senClick(this)"><span style="font-size:12px">'+s.e+'</span><span>'+s.id+'</span></button>';}).join("");}
 function senClick(btn){toggleSen(decodeURIComponent(btn.dataset.sid));}
 function renderCtxs(){document.getElementById("cChips").innerHTML=CTXS.map(function(c){var on=selCtx===c;return '<button class="chip'+(on?' am':'')+'" data-cid="'+encodeURIComponent(c)+'" onclick="ctxClick(this)">'+c+'</button>';}).join("");}
 function ctxClick(btn){var id=decodeURIComponent(btn.dataset.cid);selCtx=selCtx===id?"":id;renderCtxs();}
-function renderSelBox(){var box=document.getElementById("selBox");if(selLocs.length===0){box.style.display="none";return;}box.style.display="block";document.getElementById("selItems").innerHTML=selLocs.map(function(id){var p=PTS.find(function(x){return x.id===id;});return p?'<span class="selitem" data-sid="'+encodeURIComponent(id)+'" onclick="selClick(this)">'+p.n+'×</span>':'';}).join("");}
+function renderSelBox(){var box=document.getElementById("selBox");if(selLocs.length===0){box.style.display="none";return;}box.style.display="block";document.getElementById("selItems").innerHTML=selLocs.map(function(id){var p=PTS.find(function(x){return x.id===id;});return p?'<span class="selitem" data-sid="'+encodeURIComponent(id)+'" onclick="selClick(this)">'+p.id+'×</span>':'';}).join("");}
 function selClick(btn){toggleLoc(decodeURIComponent(btn.dataset.sid));}
 function updateBtn(){var ok=selLocs.length>0&&selSens.length>0;document.getElementById("subBtn").disabled=!ok;document.getElementById("subHint").style.display=ok?"none":"block";document.getElementById("hSub").textContent=selLocs.length>0?"已選 "+selLocs.length+" 個部位":"記錄感應 · 整理頻率 · 找回清明";}
 function toggleLoc(id){var i=selLocs.indexOf(id);if(i>=0)selLocs.splice(i,1);else selLocs.push(id);renderChips();renderSelBox();updateBtn();}
@@ -90,7 +137,7 @@ function selHex(num){selHexId=num;renderHexGrid(document.getElementById("hexSear
 function getHexLabel(num){if(!num)return"";var h=HEXAGRAMS.find(function(x){return x.num===String(num);});return h?h.nat+h.n+"（第"+h.num+"卦）":num;}
 
 async function doSubmit(){if(selLocs.length===0||selSens.length===0)return;document.getElementById("loaderTxt").textContent="記錄中……";document.getElementById("loader").className="loader on";var entry={locs:[].concat(selLocs),sens:[].concat(selSens),ctx:selCtx,note:document.getElementById("noteIn").value,intensity:+document.getElementById("intSlider").value,hex:selHexId,time:new Date()};var ok=await saveEntry(entry);document.getElementById("loader").className="loader";if(ok){hist.unshift(entry);resetForm(false);showView("history");}}
-function renderHistory(){var at=getAT();var dotCls=storageReady&&at?"on":"";var infoTxt=!at?'<span style="color:var(--amb)">⚙ 尚未設定 Airtable Token</span>':storageReady?"Airtable 已連線 · "+hist.length+" 筆":"連線中…";var clrBtn='<div style="display:flex;gap:10px;align-items:center"><button class="clrbtn" onclick="exportData()">匯出備份</button><button class="clrbtn" onclick="document.getElementById(\'importFile\').click()">匯入備份</button>'+(hist.length>0?'<button class="clrbtn" style="color:var(--rose)" onclick="clearAll()">清空</button>':'')+'</div><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">';var items=hist.length===0?'<div class="hempty"><p>尚無記錄</p><p class="s">'+(at?'完成記錄後自動儲存至 Airtable':'請先點右上角 ⚙ 設定 Airtable')+'</p></div>':hist.map(function(h,i){var lspans=h.locs.map(function(l){var p=PTS.find(function(x){return x.id===l;});return '<span class="hiloc">'+(p?p.n:l)+'</span>';}).join("");var sspans=h.sens.map(function(s){return '<span class="hisen">'+s+'</span>';}).join("");var dt=h.time instanceof Date?h.time.toLocaleDateString("zh-TW")+" "+h.time.toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}):"";var hex=getHexLabel(h.hex);var foot=[h.ctx?"對象："+h.ctx:"",hex?"卦象："+hex:"","強度："+h.intensity].filter(Boolean).join(" · ");return '<div class="hi"><div class="hitop"><div class="hilocs">'+lspans+'<span style="color:var(--bd)">·</span>'+sspans+'</div><div class="hiright"><span class="hidate">'+dt+'</span><button class="delbtn" onclick="delEntry('+i+')">×</button></div></div><div class="himsg">'+(h.note||"未填寫情境")+'</div><div class="hifoot">'+foot+'</div></div>';}).join("");document.getElementById("vHistory").innerHTML='<div class="hhdr"><div class="hst"><div class="hdot '+dotCls+'"></div><span class="hinfo">'+infoTxt+'</span></div>'+clrBtn+'</div>'+items;}
+function renderHistory(){var at=getAT();var dotCls=storageReady&&at?"on":"";var infoTxt=!at?'<span style="color:var(--amb)">⚙ 尚未設定 Airtable Token</span>':storageReady?"Airtable 已連線 · "+hist.length+" 筆":"連線中…";var clrBtn='<div style="display:flex;gap:10px;align-items:center"><button class="clrbtn" onclick="exportData()">匯出備份</button><button class="clrbtn" onclick="document.getElementById(\'importFile\').click()">匯入備份</button>'+(hist.length>0?'<button class="clrbtn" style="color:var(--rose)" onclick="clearAll()">清空</button>':'')+'</div><input type="file" id="importFile" accept=".json" style="display:none" onchange="importData(this)">';var items=hist.length===0?'<div class="hempty"><p>尚無記錄</p><p class="s">'+(at?'完成記錄後自動儲存至 Airtable':'請先點右上角 ⚙ 設定 Airtable')+'</p></div>':hist.map(function(h,i){var lspans=h.locs.map(function(l){var p=PTS.find(function(x){return x.id===l;});return '<span class="hiloc">'+(p?p.id:l)+'</span>';}).join("");var sspans=h.sens.map(function(s){return '<span class="hisen">'+s+'</span>';}).join("");var dt=h.time instanceof Date?h.time.toLocaleDateString("zh-TW")+" "+h.time.toLocaleTimeString("zh-TW",{hour:"2-digit",minute:"2-digit"}):"";var hex=getHexLabel(h.hex);var foot=[h.ctx?"對象："+h.ctx:"",hex?"卦象："+hex:"","強度："+h.intensity].filter(Boolean).join(" · ");return '<div class="hi"><div class="hitop"><div class="hilocs">'+lspans+'<span style="color:var(--bd)">·</span>'+sspans+'</div><div class="hiright"><span class="hidate">'+dt+'</span><button class="delbtn" onclick="delEntry('+i+')">×</button></div></div><div class="himsg">'+(h.note||"未填寫情境")+'</div><div class="hifoot">'+foot+'</div></div>';}).join("");document.getElementById("vHistory").innerHTML='<div class="hhdr"><div class="hst"><div class="hdot '+dotCls+'"></div><span class="hinfo">'+infoTxt+'</span></div>'+clrBtn+'</div>'+items;}
 async function delEntry(i){var h=hist[i];if(!h)return;if(!confirm("刪除這筆記錄？"))return;if(h._id)await delRecord(h._id);hist.splice(i,1);renderHistory();}
 async function clearAll(){if(!confirm("確定清空所有記錄？這會刪除 Airtable 內的資料。"))return;document.getElementById("loaderTxt").textContent="清空中……";document.getElementById("loader").className="loader on";for(var i=0;i<hist.length;i++){if(hist[i]._id)await delRecord(hist[i]._id);}hist=[];document.getElementById("loader").className="loader";renderHistory();}
 function resetForm(goForm){selLocs=[];selSens=[];selCtx="";selHexId="";document.getElementById("noteIn").value="";document.getElementById("hexSearch").value="";document.getElementById("intSlider").value=3;document.getElementById("intV").textContent="●●●○○";document.getElementById("hexSelected").style.display="none";renderChips();renderSens();renderCtxs();renderHexGrid("");renderSelBox();updateBtn();if(goForm!==false)showView("form");}
